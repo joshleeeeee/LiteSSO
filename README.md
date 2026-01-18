@@ -49,18 +49,41 @@ lite-auth/
 
 Ensure you have the following installed:
 - Go 1.21+
-- MySQL 8.0+
-- Redis 6.0+
+- Redis 6.0+ (Required for session management)
+- *Optional*: MySQL or PostgreSQL (if you don't want to use the default SQLite)
 
-### 2. Create Database
+### 2. Configure & Run
 
-```sql
-CREATE DATABASE lite_auth CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
+By default, the project uses **SQLite**, so no database setup is required to get started.
 
-### 3. Configuration
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/joshleeeeee/go-lite-auth.git
+    cd go-lite-auth
+    ```
 
-Edit `config/config.yaml` with your MySQL and Redis connection details.
+2.  **Sync dependencies:**
+    ```bash
+    go mod tidy
+    ```
+
+3.  **Run the application:**
+    ```bash
+    go run cmd/server/main.go
+    ```
+
+The application will automatically create `data/lite_auth.db` and start immediately.
+
+### 3. (Optional) Switch to MySQL/Postgres
+
+If you want to use a different database, edit `config/config.yaml`:
+
+1.  Change `database.driver` to `mysql` or `postgres`.
+2.  Update the corresponding section (`mysql` or `postgres`) with your credentials.
+3.  Create the database manually if using MySQL/Postgres:
+    ```sql
+    CREATE DATABASE lite_auth CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    ```
 
 ### 4. Install Dependencies
 
