@@ -1,128 +1,130 @@
 # Lite-Auth
 
-轻量级教学级 SSO (单点登录) 系统，使用 Go 语言构建。
+A lightweight, educational Single Sign-On (SSO) system built with Go.
 
-## 技术栈
+[中文文档 (Chinese)](README_zh.md)
 
-- **Web 框架**: Gin
-- **数据库**: MySQL 8 + GORM  
-- **缓存**: Redis
-- **认证**: JWT (Access Token + Refresh Token)
-- **配置**: Viper
+## Tech Stack
 
-## 项目结构
+- **Web Framework**: [Gin](https://github.com/gin-gonic/gin)
+- **Database**: [MySQL 8](https://www.mysql.com/) + [GORM](https://gorm.io/)
+- **Cache**: [Redis](https://redis.io/)
+- **Authentication**: JWT (Access Token + Refresh Token)
+- **Configuration**: [Viper](https://github.com/spf13/viper)
 
-```
+## Project Structure
+
+```text
 lite-auth/
 ├── cmd/
 │   └── server/
-│       └── main.go           # 程序入口
+│       └── main.go           # Entry point
 ├── config/
-│   └── config.yaml           # 配置文件
+│   └── config.yaml           # Configuration file
 ├── internal/
-│   ├── config/               # 配置加载
-│   ├── database/             # MySQL & Redis 初始化
-│   ├── handler/              # HTTP 处理器
-│   ├── middleware/           # 中间件 (JWT验证, CORS)
-│   ├── model/                # 数据模型
-│   ├── repository/           # 数据访问层
-│   ├── router/               # 路由配置
-│   └── service/              # 业务逻辑层
+│   ├── config/               # Configuration loading
+│   ├── database/             # MySQL & Redis initialization
+│   ├── handler/              # HTTP handlers (Controllers)
+│   ├── middleware/           # Middleware (JWT, CORS, etc.)
+│   ├── model/                # Data models
+│   ├── repository/           # Data access layer (DAO)
+│   ├── router/               # Route definitions
+│   └── service/              # Business logic layer
 ├── pkg/
-│   └── jwt/                  # JWT 工具包
+│   └── jwt/                  # JWT utilities
 ├── go.mod
 └── README.md
 ```
 
-## 快速开始
+## Quick Start
 
-### 1. 环境准备
+### 1. Prerequisites
 
-确保已安装:
+Ensure you have the following installed:
 - Go 1.21+
 - MySQL 8.0+
 - Redis 6.0+
 
-### 2. 创建数据库
+### 2. Create Database
 
 ```sql
 CREATE DATABASE lite_auth CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 3. 修改配置
+### 3. Configuration
 
-编辑 `config/config.yaml`，配置你的 MySQL 和 Redis 连接信息。
+Edit `config/config.yaml` with your MySQL and Redis connection details.
 
-### 4. 安装依赖
+### 4. Install Dependencies
 
 ```bash
 go mod tidy
 ```
 
-### 5. 启动服务
+### 5. Run the Server
 
 ```bash
 go run cmd/server/main.go
 ```
 
-服务将在 http://localhost:8080 启动。
+The server will start at http://localhost:8080.
 
-## API 接口
+## API Endpoints
 
-### 认证相关
+### Authentication
 
-| 方法 | 路径 | 说明 | 认证 |
-|------|------|------|------|
-| POST | `/api/auth/register` | 用户注册 | ❌ |
-| POST | `/api/auth/login` | 用户登录 | ❌ |
-| POST | `/api/auth/logout` | 用户登出 | ✅ |
-| POST | `/api/auth/refresh` | 刷新令牌 | ❌ |
-| GET | `/api/auth/validate` | 验证令牌 | ❌ |
+| Method | Path | Description | Auth Required |
+|--------|------|-------------|---------------|
+| POST | `/api/auth/register` | User Registration | ❌ |
+| POST | `/api/auth/login` | User Login | ❌ |
+| POST | `/api/auth/logout` | User Logout | ✅ |
+| POST | `/api/auth/refresh` | Refresh Token | ❌ |
+| GET | `/api/auth/validate` | Validate Token | ❌ |
 
-### 用户相关
+### User Profile
 
-| 方法 | 路径 | 说明 | 认证 |
-|------|------|------|------|
-| GET | `/api/user/info` | 获取当前用户信息 | ✅ |
+| Method | Path | Description | Auth Required |
+|--------|------|-------------|---------------|
+| GET | `/api/user/info` | Get current user info | ✅ |
 
-### 请求示例
+## Sample Requests
 
-**注册**
+### Register
 ```bash
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"test","email":"test@example.com","password":"123456"}'
 ```
 
-**登录**
+### Login
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"test","password":"123456"}'
 ```
 
-**获取用户信息**
+### Get User Info
 ```bash
 curl http://localhost:8080/api/user/info \
   -H "Authorization: Bearer <access_token>"
 ```
 
-## Redis 键设计
+## Redis Key Design
 
-| 前缀 | 用途 | 过期时间 |
+| Prefix | Purpose | TTL |
 |------|------|----------|
-| `session:` | 用户会话 | 24小时 |
-| `blacklist:` | Token 黑名单 | Token剩余有效期 |
-| `ticket:` | SSO Ticket | 60秒 |
-| `login_fail:` | 登录失败计数 | 5分钟 |
+| `session:` | User session data | 24 hours |
+| `blacklist:` | Revoked JWT tokens | Remaining JWT TTL |
+| `ticket:` | SSO Tickets | 60 seconds |
+| `login_fail:` | Login failure counter | 5 minutes |
 
-## 后续扩展
+## Roadmap
 
-- [ ] SSO Ticket 机制 (CAS 风格)
-- [ ] OAuth 2.0 授权码模式
-- [ ] 前端登录页面
-- [ ] 客户端应用管理
-- [ ] 用户管理后台
+- [ ] SSO Ticket mechanism (CAS-style)
+- [ ] OAuth 2.0 Authorization Code Flow
+- [ ] Frontend login page
+- [ ] Client application management
+- [ ] Admin dashboard
 
 ## License
 
